@@ -1,16 +1,54 @@
-# This is a sample Python script.
+from PIL import Image
+import numpy as np
+from numpy.linalg import linalg
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+def getImageMatrixes(image):
+    pix = np.array(image)
+    R = np.zeros((pix.shape[0], pix.shape[1]))
+    G = np.zeros((pix.shape[0], pix.shape[1]))
+    B = np.zeros((pix.shape[0], pix.shape[1]))
+
+    R = pix[:, :, 0]
+    G = pix[:, :, 1]
+    B = pix[:, :, 2]
+
+    return R, G, B
+
+def decomposeSVD(k, A):
+    u, s, vt = linalg.svd(A,  full_matrices=False)
+    newEpsilon = np.zeros((u.shape[0], vt.shape[0]))
+    for i in range(0, k):
+        newEpsilon[i][i] = s[i]
+    newMat = np.matmul(u, (np.matmul(newEpsilon, vt)))
+    return newMat.astype(int)
+
+def createNewImage(image, R, G, B, k):
+    pix = np.array(image)
+    newImg = np.zeros((pix.shape[0],pix.shape[1], 3))
+    newImg[:, :, 0] = R
+    newImg[:, :, 1] = G
+    newImg[:, :, 2] = B
+
+    newImg = Image.fromarray(newImg.astype('uint8'))
+    newImg.save(str(k) + "Fox.jpg")
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+  image = Image.open("fox.jpg")
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+  R, G, B = getImageMatrixes(image)
+  ks = [550,600,700]
+
+#  nR = decomposeSVD(5, R)
+#  nG = decomposeSVD(500, G)
+#  nB = decomposeSVD(500, B)
+#  createNewImage(image, nR, nG, nB, "5-100")
+
+  for k in ks:
+        nR = decomposeSVD(k, R)
+        nG = decomposeSVD(k, G)
+        nB = decomposeSVD(k, B)
+        createNewImage(image, nR, nG, nB, k)
+
+
+
