@@ -29,26 +29,27 @@ def createNewImage(image, R, G, B, k):
     newImg[:, :, 1] = G
     newImg[:, :, 2] = B
 
-    newImg = Image.fromarray(newImg.astype('uint8'))
-    newImg.save(str(k) + "Fox.jpg")
+    new_Img = Image.fromarray(newImg.astype('uint8'))
+    new_Img.save(str(k) + "Fox_2.jpg")
+    return newImg
 
+def error(sig, k):
+    return sum(sig[k+1:] ** 2) / sum(sig**2)
 
 if __name__ == '__main__':
-  image = Image.open("fox.jpg")
+  image = Image.open("fox_2.jpg")
 
   R, G, B = getImageMatrixes(image)
-  ks = [550,600,700]
-
-#  nR = decomposeSVD(5, R)
-#  nG = decomposeSVD(500, G)
-#  nB = decomposeSVD(500, B)
-#  createNewImage(image, nR, nG, nB, "5-100")
+  ks = [5, 50, 250, 300, 350, 400, 600]
 
   for k in ks:
         nR = decomposeSVD(k, R)
         nG = decomposeSVD(k, G)
         nB = decomposeSVD(k, B)
-        createNewImage(image, nR, nG, nB, k)
+        newIm = createNewImage(image, nR, nG, nB, k)
+
+        print(k)
+        print( + error(np.linalg.svd(R)[1], k))
 
 
 
